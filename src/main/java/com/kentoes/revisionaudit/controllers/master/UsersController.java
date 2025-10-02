@@ -8,10 +8,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.history.Revision;
 import org.springframework.data.history.Revisions;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.Optional;
 
 @RestController
@@ -21,8 +22,10 @@ public class UsersController {
     private final UsersRepository usersRepository;
 
     @GetMapping
-    public List<Users> getAllUsers() {
-        return usersRepository.findAll();
+    public ResponseEntity<?> getAllUsers() {
+//        return usersRepository.findAll();
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        return ResponseEntity.ok(authentication.getPrincipal().toString());
     }
 
     @PostMapping
@@ -72,10 +75,15 @@ public class UsersController {
 
     @GetMapping("/revision/{id}")
     public ResponseEntity<?> getRevision(@PathVariable Long id) {
-        Optional<Revision<Integer, Users>> lastChangeRevision = usersRepository.findLastChangeRevision(id);
-        if (lastChangeRevision.isEmpty()) {
+//        Optional<Revision<Integer, Users>> lastChangeRevision = usersRepository.findLastChangeRevision(id);
+//        if (lastChangeRevision.isEmpty()) {
+//            return ResponseEntity.notFound().build();
+//        }
+        Optional<Users> users = usersRepository.findById(id);
+        if (users.isEmpty())
             return ResponseEntity.notFound().build();
-        }
-        return ResponseEntity.ok(lastChangeRevision.get());
+        Optional<Revision<Integer, Users>> revision = usersRepository
+                .findRevision(users.get().getId(), users.get().getVersion() - 1);
+        return ResponseEntity.ok(revision);
     }
 }

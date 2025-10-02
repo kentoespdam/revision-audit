@@ -45,12 +45,12 @@ public class IdsAbstract implements Serializable {
     @LastModifiedDate
     @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
-//    @Audited
-//    @Column(name = "is_deleted", columnDefinition = "boolean default false")
-//    private Boolean isDeleted = false;
-//    @Version
-//    @Column(name = "version")
-//    private Long version = 1L;
+    @Audited
+    @Column(name = "is_deleted", columnDefinition = "boolean default false")
+    private Boolean isDeleted = false;
+    @Version
+    @Column(name = "version")
+    private Integer version = 1;
 
     @Override
     public final boolean equals(Object o) {
